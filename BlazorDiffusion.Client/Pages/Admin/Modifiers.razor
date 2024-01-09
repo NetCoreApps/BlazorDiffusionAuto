@@ -1,0 +1,13 @@
+﻿@page "/admin/modifiers"
+@attribute [Authorize(Roles = "Admin")]
+@rendermode RenderMode.InteractiveServer
+
+@inject NavigationManager NavigationManager
+
+<Breadcrumbs class="mb-8" HomeHref="/admin">
+    <Breadcrumb>
+        Modifiers
+    </Breadcrumb>
+</Breadcrumbs>
+
+<AutoQueryGrid Model="Modifier" Apis="Apis.AutoQuery<QueryModifiers,CreateModifier,UpdateModifier,DeleteModifier>()" />

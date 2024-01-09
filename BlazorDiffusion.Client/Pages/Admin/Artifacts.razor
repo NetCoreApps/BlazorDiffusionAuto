@@ -1,0 +1,44 @@
+﻿@page "/admin/artifacts"
+@attribute [Authorize(Roles = "Admin")]
+@rendermode RenderMode.InteractiveServer
+
+<Breadcrumbs class="mb-8" HomeHref="/admin">
+    <Breadcrumb>
+        Creative Artifacts
+    </Breadcrumb>
+</Breadcrumbs>
+
+<Tabs TabOptions="TabOptions" @bind-Tab=Tab></Tabs>
+
+@if (Tab == "Reported")
+{
+    <ArtifactReportsAutoQueryGrid />
+}
+else if (Tab == "Stats")
+{
+    <AutoQueryGrid Model="ArtifactStat" Apis="Apis.AutoQuery<QueryArtifactStats>()" />
+}
+else if (Tab == "Comments")
+{
+    <AutoQueryGrid Model="ArtifactComment" Apis="Apis.AutoQuery<AdminQueryArtifactComments,CreateArtifactComment,AdminUpdateArtifactComment,AdminDeleteArtifactComment>()" />
+}
+else if (Tab == "CommentReports")
+{
+    <AutoQueryGrid Model="ArtifactCommentReport" Apis="Apis.AutoQuery<AdminQueryArtifactCommentReports,AdminUpdateArtifactCommentReport,AdminDeleteArtifactCommentReport>()" />
+}
+else //All
+{
+    <ArtifactAutoQueryGrid />
+}
+
+@code {
+    public string? Tab { get; set; }
+    public Dictionary<string, string> TabOptions = new()
+    {
+        {"All","All"},
+        {"Reported","Reported Artifacts"},
+        {"Stats","Stats"},
+        {"Comments","Comments"},
+        {"CommentReports","Reports"},
+    };
+}

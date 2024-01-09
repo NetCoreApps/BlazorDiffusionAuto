@@ -1,0 +1,13 @@
+﻿@page "/admin/search-stats"
+@attribute [Authorize(Roles = "Admin")]
+@rendermode RenderMode.InteractiveServer
+
+@inject NavigationManager NavigationManager
+
+<Breadcrumbs class="mb-8" HomeHref="/admin">
+    <Breadcrumb>
+        Search Stats
+    </Breadcrumb>
+</Breadcrumbs>
+
+<AutoQueryGrid Model="SearchStat" Apis="Apis.AutoQuery<QuerySearchStats>()" />

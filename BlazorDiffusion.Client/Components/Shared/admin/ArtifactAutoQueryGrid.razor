@@ -1,0 +1,49 @@
+﻿<AutoQueryGrid @ref=@grid Model="Artifact" Apis="Apis.AutoQuery<QueryArtifacts,UpdateArtifact>()">
+    <EditForm>
+        <div class="relative z-10" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+            <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
+                <ArtifactEdit Artifact="context" OnClose="grid!.OnEditDone" />
+            </div>
+        </div>
+    </EditForm>
+    <Columns>
+        <Column Title="Creative" Field="(Artifact x) => x.CreativeId">
+            <Template>
+                <TextLink class="flex" href=@($"/admin/creatives?Id={context.CreativeId}")>
+                    <Icon class="w-6 h-6 mr-1" Image=@typeof(Creative).GetIcon() />
+                    @context.CreativeId
+                </TextLink>
+            </Template>
+        </Column>
+        <Column Title="Id" Field="(Artifact x) => x.Id" />
+        <Column Field="(Artifact x) => x.FilePath">
+            <Template>
+                <img class="h-20 w-20 object-cover" src="https://cdn.diffusion.works@(context.FilePath)" alt=@context.FileName>
+            </Template>
+        </Column>
+        <Column Field="(Artifact x) => x.CreatedDate" Format="s" />
+        <Column Field="(Artifact x) => x.Prompt">
+            <Template>
+                @context.Prompt.SubstringWithEllipsis(0,100)
+            </Template>
+        </Column>
+        <Column Field="(Artifact x) => x.Width" Title="Dimensions">
+            <Template>
+                <span title="@context.Width x @context.Height">@ImageSizeDescription(context)</span>
+            </Template>
+        </Column>
+    </Columns>
+</AutoQueryGrid>
+
+@code {
+    AutoQueryGrid<Artifact>? grid;
+
+    string ImageSizeDescription(Artifact artifact)
+    {
+        if (artifact.Width == artifact.Height)
+            return "Square";
+        if (artifact.Width > artifact.Height)
+            return "Landscape";
+        return "Portrait";
+    }
+}

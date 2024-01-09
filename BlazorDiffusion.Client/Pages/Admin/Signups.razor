@@ -1,0 +1,13 @@
+﻿@page "/admin/signups"
+@attribute [Authorize(Roles = "Admin")]
+@rendermode RenderMode.InteractiveServer
+
+@inject NavigationManager NavigationManager
+
+<Breadcrumbs class="mb-8" HomeHref="/admin">
+    <Breadcrumb>
+        Signups
+    </Breadcrumb>
+</Breadcrumbs>
+
+<AutoQueryGrid Model="Signup" Apis="Apis.AutoQuery<QuerySignups,CreateSignup,UpdateSignup,DeleteSignup>()" />

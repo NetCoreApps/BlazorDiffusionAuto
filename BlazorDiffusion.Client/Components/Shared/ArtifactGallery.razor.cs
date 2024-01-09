@@ -1,0 +1,254 @@
+﻿using BlazorDiffusion.ServiceModel;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.AspNetCore.Components.Web;
+using ServiceStack;
+using ServiceStack.Blazor;
+using ServiceStack.Blazor.Components.Tailwind;
+using System;
+using System.Linq;
+using BlazorDiffusion.Client.UI;
+using static System.Net.Mime.MediaTypeNames;
+
+namespace BlazorDiffusion.Client.Components.Shared;
+
+public record struct GalleryChangeEventArgs(int? SelectedId, int? ViewingId)
+{
+    public override string ToString() => $"({SelectedId},{ViewingId})";
+}
+
+public partial class ArtifactGallery : AppAuthComponentBase, IDisposable
+{
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+
+    [Parameter] public RenderFragment? LeftHeader { get; set; }
+    [Parameter] public RenderFragment? RightHeader { get; set; }
+    [Parameter] public RenderFragment<Artifact>? TopRightIcon { get; set; }
+    [Parameter] public RenderFragment<Artifact>? TopMenu { get; set; }
+    [Parameter] public RenderFragment<Artifact>? BottomMenu { get; set; }
+    [Parameter] public Func<Artifact, int?, UserState, string> ResolveBorderColor { get; set; } = ArtifactExtensions.GetBorderColor;
+    [Parameter] public bool? Ssg { get; set; }
+    [Parameter] public string? ColumnsSliderClass { get; set; }
+    [Parameter] public EventCallback<GalleryChangeEventArgs> Change { get; set; }
+
+    //public SimpleSlideOver? SlideOver { get; set; }
+    [Parameter] public GalleryResults Results { get; set; } = new();
+
+    public List<Artifact> Artifacts => Results.Artifacts;
+    public Artifact? Selected => Results.Selected;
+    public Artifact? Viewing => Results.Viewing;
+    Artifact? Active => Viewing ?? Selected;
+    Creative? Creative => Results.Creative;
+    AlbumResult[] CreativeAlbums => Results.CreativeAlbums;
+
+    IEnumerable<AlbumResult> GetArtifactAlbums()
+    {
+        var artifactId = Viewing?.Id ?? Selected?.Id;
+        return artifactId != null ? CreativeAlbums.Where(x => x.ArtifactIds.Contains(artifactId.Value)) : Array.Empty<AlbumResult>();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        UserState.OnChange += UserStateChanged;
+        log("Index OnInitializedAsync() += StateHasChanged");
+    }
+
+    class ParamsState
+    {
+        int? selected;
+        int? viewing;
+        public ParamsState(int? selected, int? viewing)
+        {
+            this.selected = selected;
+            this.viewing = viewing;
+        }
+        public bool Matches(ParamsState a) => selected == a.selected && viewing == a.viewing;
+        public override string ToString() => $"({selected},{viewing})";
+    }
+    ParamsState currentState() => new ParamsState(Selected?.Id, Viewing?.Id);
+
+    void UserStateChanged()
+    {
+        log("ArtifactGallery UserStateChanged()");
+        StateHasChanged();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        RegisterKeyboardNavigation(OnNavKeyAsync);
+
+        log("ArtifactGallery OnParametersSetAsync{0}", currentState());
+    }
+
+    async Task SaveAppPrefsAsync()
+    {
+        await UserState.SaveAppPrefsAsync();
+        await OnChange();
+    }
+
+    async Task ToggleShuffleAsync()
+    {
+        await UserState.ToggleShuffleAsync();
+        await OnChange();
+    }
+
+    async Task navTo(int? artifactId = null, int? viewArtifactId = null)
+    {
+        //waitForState = new ParamsState(artifactId, viewArtifactId);
+        log("ArtifactGallery navTo{0}", new ParamsState(artifactId, viewArtifactId));
+        DeregisterKeyboardNavigation(OnNavKeyAsync);
+        await Change.InvokeAsync(new(artifactId, viewArtifactId));
+    }
+
+    async Task LikeArtifactAsync(Artifact artifact)
+    {
+        await UserState.LikeArtifactAsync(artifact);
+        await OnChange();
+    }
+
+    async Task UnlikeArtifactAsync(Artifact artifact)
+    {
+        await UserState.UnlikeArtifactAsync(artifact);
+        await OnChange();
+    }
+
+    async Task hardDelete(int creativeId)
+    {
+        var api = await UserState.HardDeleteCreativeByIdAsync(creativeId);
+        if (api.Succeeded)
+        {
+            Artifacts.RemoveAll(x => x.CreativeId == creativeId);
+            await navTo();
+            StateHasChanged();
+        }
+    }
+
+    async Task CloseDialogsAsync()
+    {
+        await hideArtifactMenu();
+        if (Selected?.Id != null)
+            await navTo();
+        StateHasChanged();
+    }
+
+    public async Task OnNavKeyAsync(string key)
+    {
+        if (key == KeyCodes.Escape)
+        {
+            await CloseDialogsAsync();
+            return;
+        }
+
+        if (Selected == null)
+        {
+            if (key == KeyCodes.ArrowRight || key == KeyCodes.ArrowDown)
+            {
+                var artifact = Artifacts.FirstOrDefault();
+                if (artifact != null)
+                {
+                    await navTo(artifact.Id);
+                }
+            }
+            return;
+        }
+
+        if (key == KeyCodes.ArrowLeft || key == KeyCodes.ArrowRight)
+        {
+            var artifacts = Artifacts;
+            var activeIndex = artifacts.FindIndex(x => x.Id == Selected.Id);
+            if (activeIndex >= 0)
+            {
+                var nextIndex = key switch
+                {
+                    KeyCodes.ArrowLeft => activeIndex - 1,
+                    KeyCodes.ArrowRight => activeIndex + 1,
+                    _ => 0
+                };
+                if (nextIndex < 0)
+                {
+                    nextIndex = artifacts.Count - 1;
+                }
+                var next = artifacts[nextIndex % artifacts.Count];
+                await navTo(next.Id);
+            }
+        }
+        else if (key == KeyCodes.ArrowUp || key == KeyCodes.ArrowDown)
+        {
+            if (Creative != null && Viewing != null)
+            {
+                var artifacts = Creative.GetModeratedArtifacts(User);
+                var activeIndex = artifacts.FindIndex(x => x.Id == Viewing.Id);
+                if (activeIndex >= 0)
+                {
+                    var nextIndex = key switch
+                    {
+                        KeyCodes.ArrowUp => activeIndex - 1,
+                        KeyCodes.ArrowDown => activeIndex + 1,
+                        _ => 0
+                    };
+                    if (nextIndex < 0)
+                    {
+                        nextIndex = artifacts.Count - 1;
+                    }
+                    var next = artifacts[nextIndex % artifacts.Count];
+                    await navTo(Selected.Id, next.Id);
+                    return;
+                }
+            }
+            if (Creative != null)
+            {
+                if (key == KeyCodes.ArrowDown)
+                {
+                    var artifact = Creative.GetModeratedArtifacts(User).FirstOrDefault();
+                    if (artifact != null)
+                    {
+                        await navTo(Selected.Id, artifact.Id);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    public Task exploreSimilar(Artifact artifact)
+    {
+        NavigationManager.NavigateTo($"/?similar={artifact.RefId}");
+        return Task.CompletedTask;
+    }
+
+    const int DefaultArtifactOffsetX = 60;
+    Artifact? artifactMenu;
+    MouseEventArgs? artifactMenuArgs;   
+    int artifactOffsetX = DefaultArtifactOffsetX;
+
+    public async Task hideArtifactMenu()
+    {
+        artifactMenu = null;
+        artifactMenuArgs = null;
+        artifactOffsetX = DefaultArtifactOffsetX;
+    }
+
+    public async Task showArtifactMenu(MouseEventArgs e, Artifact artifact, int offsetX = DefaultArtifactOffsetX)
+    {
+        artifactMenuArgs = e;
+        artifactMenu = artifact;
+        artifactOffsetX = offsetX;
+    }
+
+    async Task OnChange()
+    {
+        var state = new GalleryChangeEventArgs(Selected?.Id, Viewing?.Id);
+        log("ArtifactGallery OnChange{0}", state);
+        UserStateChanged();
+        await Change.InvokeAsync(state);
+    }
+
+    public void Dispose()
+    {
+        UserState.OnChange -= UserStateChanged;
+        DeregisterKeyboardNavigation(OnNavKeyAsync);
+        log("Index Dispose() -= StateHasChanged");
+    }
+}

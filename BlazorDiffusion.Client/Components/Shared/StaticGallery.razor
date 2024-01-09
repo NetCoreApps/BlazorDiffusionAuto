@@ -1,0 +1,17 @@
+﻿@using BlazorDiffusion.Client.UI
+@inherits AppAuthComponentBase
+
+<div class=@ClassNames("grid", AppCss.GetGridClass(GridColumns))>
+@foreach (var artifact in Artifacts.OrEmpty())
+{
+    <StaticImage Artifact="artifact" />
+}
+</div>
+
+@code {
+    [Inject] public NavigationManager NavigationManager { get; set; }
+    [Parameter] public GalleryResults Results { get; set; } = new();
+    [Parameter] public int GridColumns { get; set; } = 5;
+
+    public List<Artifact> Artifacts => Results.Artifacts;
+}

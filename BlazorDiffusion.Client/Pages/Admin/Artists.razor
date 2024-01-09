@@ -1,0 +1,28 @@
+﻿@page "/admin/artists"
+@attribute [Authorize(Roles = "Admin")]
+@rendermode RenderMode.InteractiveServer
+
+@inject NavigationManager NavigationManager
+
+<Breadcrumbs class="mb-8" HomeHref="/admin">
+    <Breadcrumb>
+        Artists
+    </Breadcrumb>
+</Breadcrumbs>
+
+<AutoQueryGrid Model="Artist" Apis="Apis.AutoQuery<QueryArtists,CreateArtist,UpdateArtist,DeleteArtist>()">
+    <Columns>
+        <Column Field="(Artist x) => x.FirstName"></Column>
+        <Column Field="(Artist x) => x.LastName"></Column>
+        <Column Field="(Artist x) => x.YearDied"></Column>
+        <Column Field="(Artist x) => x.Type">
+            <Template>
+                <span>@context.Type?.Join(", ")</span>
+            </Template>
+        </Column>
+        <Column Field="(Artist x) => x.Score"></Column>
+        <Column Field="(Artist x) => x.Rank"></Column>
+        <Column Field="(Artist x) => x.CreatedDate"></Column>
+        <Column Field="(Artist x) => x.CreatedBy"></Column>
+    </Columns>
+</AutoQueryGrid>
