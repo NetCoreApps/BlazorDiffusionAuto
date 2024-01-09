@@ -115,7 +115,10 @@ public class ConfigureDbMigrations : IHostingStartup
                 Avatar = user.Avatar,
                 EmailConfirmed = true,
             };
-            await EnsureUserAsync(appUser, "p@55wOrd", user.Roles);
+            if(appUser.Email == "admin@email.com")
+                await EnsureUserAsync(appUser, "p@55wOrd", AppRoles.All);
+            else
+                await EnsureUserAsync(appUser, "p@55wOrd", user.Roles);
         }
     }
 
