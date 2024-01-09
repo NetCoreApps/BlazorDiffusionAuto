@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using ServiceStack.Blazor;
 
-namespace BlazorDiffusion.UI;
+namespace BlazorDiffusion.Client.UI;
 
 public static class ArtifactExtensions
 {

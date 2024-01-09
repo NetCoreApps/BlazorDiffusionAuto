@@ -4,8 +4,8 @@
 @using Microsoft.AspNetCore.Identity
 @using BlazorDiffusion.Data
 
-@inject UserManager<ApplicationUser> UserManager
-@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<AppUser> UserManager
+@inject SignInManager<AppUser> SignInManager
 @inject IdentityUserAccessor UserAccessor
 @inject IdentityRedirectManager RedirectManager
 
@@ -44,7 +44,7 @@
 </div>
 
 @code {
-    private ApplicationUser user = default!;
+    private AppUser user = default!;
     private string? username;
     private string? phoneNumber;
 

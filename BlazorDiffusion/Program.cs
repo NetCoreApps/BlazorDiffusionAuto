@@ -8,6 +8,10 @@ using BlazorDiffusion.Components.Account;
 using BlazorDiffusion.Data;
 using ServiceStack.Blazor;
 using System.Net;
+using BlazorDiffusion.Client.UI;
+using BlazorDiffusion.ServiceInterface;
+using BlazorDiffusion.ServiceModel;
+using Ljbc1994.Blazor.IntersectionObserver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,22 +44,26 @@ services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString, b => b.MigrationsAssembly(nameof(BlazorDiffusion))));
 services.AddDatabaseDeveloperPageExceptionFilter();
 
-services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddRoles<IdentityRole>()
+services.AddIdentityCore<AppUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<AppRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
-services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+services.AddSingleton<IEmailSender<AppUser>, IdentityNoOpEmailSender>();
 // Uncomment to send emails with SMTP, configure SMTP with "SmtpConfig" in appsettings.json
-//services.AddSingleton<IEmailSender<ApplicationUser>, EmailSender>();
-services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, AdditionalUserClaimsPrincipalFactory>();
+//services.AddSingleton<IEmailSender<AppUser>, EmailSender>();
+services.AddScoped<IUserClaimsPrincipalFactory<AppUser>, AdditionalUserClaimsPrincipalFactory>();
 
 var baseUrl = builder.Configuration["ApiBaseUrl"] ??
     (builder.Environment.IsDevelopment() ? "https://localhost:5001" : "http://" + IPAddress.Loopback);
 services.AddScoped(c => new HttpClient { BaseAddress = new Uri(baseUrl) });
 services.AddBlazorServerIdentityApiClient(baseUrl);
 services.AddLocalStorage();
+
+builder.Services.AddScoped<KeyboardNavigation>();
+builder.Services.AddScoped<UserState>();
+builder.Services.AddIntersectionObserver();
 
 var app = builder.Build();
 

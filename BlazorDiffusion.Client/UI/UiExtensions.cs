@@ -1,6 +1,7 @@
 ﻿using System.Collections.Specialized;
+using ServiceStack;
 
-namespace BlazorDiffusion.UI;
+namespace BlazorDiffusion.Client.UI;
 
 public static class UiExtensions
 {

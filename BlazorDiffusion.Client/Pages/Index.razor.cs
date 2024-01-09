@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using BlazorDiffusion.UI;
-using BlazorDiffusion.Components.Shared;
+using BlazorDiffusion.Client.UI;
+using BlazorDiffusion.Client.Components.Shared;
 using BlazorDiffusion.ServiceModel;
 using Ljbc1994.Blazor.IntersectionObserver;
+using ServiceStack;
 
-namespace BlazorDiffusion.Components.Pages;
+namespace BlazorDiffusion.Client.Pages;
 
 public partial class Index : AppAuthComponentBase, IDisposable
 {

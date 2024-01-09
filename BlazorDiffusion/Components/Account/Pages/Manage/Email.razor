@@ -7,8 +7,8 @@
 @using Microsoft.AspNetCore.WebUtilities
 @using BlazorDiffusion.Data
 
-@inject UserManager<ApplicationUser> UserManager
-@inject IEmailSender<ApplicationUser> EmailSender
+@inject UserManager<AppUser> UserManager
+@inject IEmailSender<AppUser> EmailSender
 @inject IdentityUserAccessor UserAccessor
 @inject NavigationManager NavigationManager
 
@@ -66,7 +66,7 @@
 
 @code {
     private string? message;
-    private ApplicationUser user = default!;
+    private AppUser user = default!;
     private string? email;
     private bool isEmailConfirmed;
 

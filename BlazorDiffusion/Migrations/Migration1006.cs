@@ -91,7 +91,7 @@ public class Migration1006 : MigrationBase
         public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
     }
     
-    public class Artifact : AuditBase
+    public class Artifact
     {
         [AutoIncrement]
         public int Id { get; set; }
@@ -132,6 +132,19 @@ public class Migration1006 : MigrationBase
         public int Score { get; set; }
         public int Rank { get; set; }
         public string RefId { get; set; }
+        
+        public DateTime CreatedDate { get; set; }
+        
+        public string CreatedBy { get; set; }
+        
+        public DateTime ModifiedDate { get; set; }
+        
+        public string ModifiedBy { get; set; }
+        
+        public DateTime? DeletedDate { get; set; }
+        
+        public string DeletedBy { get; set; }
+        
         public string? FilePathSmall { get; set; } // 118x118 or 118x207
         public string? FilePathMedium { get; set; } // 288x288 or 288x504
         public string? FilePathLarge { get; set; } // Original Size in .webp

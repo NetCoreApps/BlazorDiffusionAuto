@@ -1,6 +1,6 @@
 ﻿@page "/secure/coupons"
-@attribute [Authorize(Roles = Roles.Employee)]
-@rendermode InteractiveAuto
+@attribute [Authorize(Roles = "Employee")]
+@rendermode RenderMode.InteractiveServer
 
 <PageTitle>Coupons</PageTitle>
 

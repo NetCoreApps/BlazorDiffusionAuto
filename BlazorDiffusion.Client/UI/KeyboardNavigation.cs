@@ -1,4 +1,4 @@
-﻿namespace BlazorDiffusion.UI;
+﻿namespace BlazorDiffusion.Client.UI;
 
 /// <summary>
 /// Ensure only the Active target component receives Nav Keys

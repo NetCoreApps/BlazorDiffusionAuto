@@ -7,7 +7,7 @@ using ServiceStack.Blazor;
 using BlazorDiffusion.ServiceModel;
 using System.Security.Claims;
 
-namespace BlazorDiffusion.UI;
+namespace BlazorDiffusion.Client.UI;
 
 public static class CreativeExtensions
 {

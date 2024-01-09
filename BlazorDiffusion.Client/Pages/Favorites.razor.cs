@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Routing;
+﻿using BlazorDiffusion.Client.Components.Shared;
+using BlazorDiffusion.Client.UI;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using BlazorDiffusion.UI;
+
 using BlazorDiffusion.ServiceModel;
 using Ljbc1994.Blazor.IntersectionObserver;
-using BlazorDiffusion.Shared;
+using ServiceStack;
 
-namespace BlazorDiffusion.Pages;
+namespace BlazorDiffusion.Client.Pages;
 
 public partial class Favorites : AppAuthComponentBase, IDisposable
 {

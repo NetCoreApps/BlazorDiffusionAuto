@@ -3,7 +3,7 @@ using ServiceStack.Blazor;
 using BlazorDiffusion.ServiceModel;
 using Microsoft.AspNetCore.Components;
 
-namespace BlazorDiffusion.UI;
+namespace BlazorDiffusion.Client.UI;
 
 public class UserState
 {

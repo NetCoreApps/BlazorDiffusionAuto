@@ -35,5 +35,8 @@ public class TodosServices : Service
         return todo;
     }
 
+    // Handles Deleting the Todo item
+    public void Delete(DeleteTodo request) => Todos.TryDeleteById(request.Id);
+
     public void Delete(DeleteTodos request) => Todos.TryDeleteByIds(request.Ids);
 }

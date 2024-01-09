@@ -35,7 +35,7 @@ public class ConfigureMq : IHostingStartup
 /// <summary>
 /// Sends emails by publishing a message to the Background MQ Server where it's processed in the background
 /// </summary>
-public class EmailSender(IMessageService messageService) : IEmailSender<ApplicationUser>
+public class EmailSender(IMessageService messageService) : IEmailSender<AppUser>
 {
     public Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
@@ -50,12 +50,12 @@ public class EmailSender(IMessageService messageService) : IEmailSender<Applicat
         return Task.CompletedTask;
     }
 
-    public Task SendConfirmationLinkAsync(ApplicationUser user, string email, string confirmationLink) =>
+    public Task SendConfirmationLinkAsync(AppUser user, string email, string confirmationLink) =>
         SendEmailAsync(email, "Confirm your email", $"Please confirm your account by <a href='{confirmationLink}'>clicking here</a>.");
 
-    public Task SendPasswordResetLinkAsync(ApplicationUser user, string email, string resetLink) =>
+    public Task SendPasswordResetLinkAsync(AppUser user, string email, string resetLink) =>
         SendEmailAsync(email, "Reset your password", $"Please reset your password by <a href='{resetLink}'>clicking here</a>.");
 
-    public Task SendPasswordResetCodeAsync(ApplicationUser user, string email, string resetCode) =>
+    public Task SendPasswordResetCodeAsync(AppUser user, string email, string resetCode) =>
         SendEmailAsync(email, "Reset your password", $"Please reset your password using the following code: {resetCode}");
 }

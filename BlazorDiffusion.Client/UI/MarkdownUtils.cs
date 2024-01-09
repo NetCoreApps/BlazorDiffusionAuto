@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BlazorDiffusion.UI;
+namespace BlazorDiffusion.Client.UI;
 
 public class MarkdownFileInfo
 {

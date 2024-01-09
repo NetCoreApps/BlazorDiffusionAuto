@@ -1,10 +1,10 @@
 ﻿using BlazorDiffusion.ServiceModel;
-using BlazorDiffusion.Shared;
-using BlazorDiffusion.UI;
+using BlazorDiffusion.Client.UI;
 using Ljbc1994.Blazor.IntersectionObserver;
 using Microsoft.AspNetCore.Components;
+using ServiceStack;
 
-namespace BlazorDiffusion.Pages;
+namespace BlazorDiffusion.Client.Pages;
 
 public partial class Albums : AppAuthComponentBase
 {

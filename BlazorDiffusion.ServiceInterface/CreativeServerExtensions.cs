@@ -43,7 +43,7 @@ public static class CreativeServerExtensions
             ArtifactIds = album.PrimaryArtifactId == null
                 ? album.Artifacts.OrderByDescending(x => x.Id).Map(x => x.ArtifactId)
                 : X.Apply(new List<int> { album.PrimaryArtifactId.Value },
-                    ids => ids.AddRange(album.Artifacts.Where(x => x.ArtifactId != album.PrimaryArtifactId.Value)
+                    ids => ids.AddRange(album.Artifacts.Where(x => album.PrimaryArtifactId.HasValue && x.ArtifactId != album.PrimaryArtifactId.Value)
                         .OrderByDescending(x => x.Id).Select(x => x.ArtifactId))),
         };
         return to;

@@ -1,11 +1,16 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using BlazorDiffusion.Data;
 using BlazorDiffusion.Migrations;
+using BlazorDiffusion.ServiceInterface;
 using BlazorDiffusion.ServiceModel;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using ProtoBuf.Meta;
 using ServiceStack;
 using ServiceStack.Data;
+using ServiceStack.DataAnnotations;
 using ServiceStack.OrmLite;
+using SQLitePCL;
+using static System.Formats.Asn1.AsnWriter;
 
 [assembly: HostingStartup(typeof(BlazorDiffusion.ConfigureDbMigrations))]
 
@@ -25,12 +30,12 @@ public class ConfigureDbMigrations : IHostingStartup
                 var scopeFactory = appHost.GetApplicationServices().GetRequiredService<IServiceScopeFactory>();
                 using (var scope = scopeFactory.CreateScope())
                 {
-                    using var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    db.Database.EnsureCreated();
-                    db.Database.Migrate();
+                    using var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    var dbJustCreated = dbContext.Database.EnsureCreated();
+                    dbContext.Database.Migrate();
 
                     // Only seed users if DB was just created
-                    if (!db.Users.Any())
+                    if (!dbContext.Users.Any())
                     {
                         log.LogInformation("Adding Seed Users...");
                         AddSeedUsers(scope.ServiceProvider).Wait();
@@ -41,15 +46,33 @@ public class ConfigureDbMigrations : IHostingStartup
                 migrator.Run();
             });
             AppTasks.Register("migrate.revert", args => migrator.Revert(args[0]));
+            AppTasks.Register("migrate.users", _ => {
+                var log = appHost.GetApplicationServices().GetRequiredService<ILogger<ConfigureDbMigrations>>();
+
+                log.LogInformation("Running migrate.users...");
+                var scopeFactory = appHost.GetApplicationServices().GetRequiredService<IServiceScopeFactory>();
+                using var scope = scopeFactory.CreateScope();
+                using var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                using var db = scope.ServiceProvider.GetRequiredService<IDbConnectionFactory>().Open();
+                var migrateUsers = db.Select(db.From<OldAppUser>().OrderBy(x => x.Id));
+
+                log.LogInformation("Migrating {Count} Existing ServiceStack Users to Identity Auth Users...", migrateUsers.Count);
+                MigrateExistingUsers(dbContext, scope.ServiceProvider, migrateUsers).Wait();
+            });
             AppTasks.Run();
+
+            using var db = migrator.DbFactory.OpenDbConnection();
+            Scores.Load(db);
+            using var dbAnalytics = migrator.DbFactory.OpenDbConnection(Databases.Analytics);
+            Scores.LoadAnalytics(dbAnalytics);
         });
 
     private async Task AddSeedUsers(IServiceProvider services)
     {
         //initializing custom roles 
-        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-        string[] allRoles = [Roles.Admin, Roles.Manager, Roles.Employee];
+        var roleManager = services.GetRequiredService<RoleManager<AppRole>>();
+        var userManager = services.GetRequiredService<UserManager<AppUser>>();
+        string[] allRoles = AppRoles.All;
 
         void assertResult(IdentityResult result)
         {
@@ -57,7 +80,7 @@ public class ConfigureDbMigrations : IHostingStartup
                 throw new Exception(result.Errors.First().Description);
         }
 
-        async Task EnsureUserAsync(ApplicationUser user, string password, string[]? roles = null)
+        async Task EnsureUserAsync(AppUser user, string password, string[]? roles = null)
         {
             var existingUser = await userManager.FindByEmailAsync(user.Email!);
             if (existingUser != null) return;
@@ -75,52 +98,86 @@ public class ConfigureDbMigrations : IHostingStartup
             var roleExist = await roleManager.RoleExistsAsync(roleName);
             if (!roleExist)
             {
-                //Create the roles and seed them to the database
-                assertResult(await roleManager.CreateAsync(new IdentityRole(roleName)));
+                //create the roles and seed them to the database: Question 1
+                assertResult(await roleManager.CreateAsync(new AppRole(roleName)));
             }
         }
 
-        await EnsureUserAsync(new ApplicationUser
+        foreach (var user in Users.All)
         {
-            DisplayName = "Test User",
-            Email = "test@email.com",
-            UserName = "test@email.com",
-            FirstName = "Test",
-            LastName = "User",
-            EmailConfirmed = true,
-            ProfileUrl = "/img/profiles/user1.svg",
-        }, "p@55wOrd");
+            var appUser = new AppUser
+            {
+                Id = user.Id,
+                Email = user.Email,
+                DisplayName = user.DisplayName,
+                UserName = user.Email,
+                Handle = user.Handle,
+                Avatar = user.Avatar,
+                EmailConfirmed = true,
+            };
+            await EnsureUserAsync(appUser, "p@55wOrd", user.Roles);
+        }
+    }
 
-        await EnsureUserAsync(new ApplicationUser
-        {
-            DisplayName = "Test Employee",
-            Email = "employee@email.com",
-            UserName = "employee@email.com",
-            FirstName = "Test",
-            LastName = "Employee",
-            EmailConfirmed = true,
-            ProfileUrl = "/img/profiles/user2.svg",
-        }, "p@55wOrd", [Roles.Employee]);
+    private async Task MigrateExistingUsers(ApplicationDbContext dbContext, IServiceProvider services, 
+        List<OldAppUser> migrateUsers, string tempPassword="p@55wOrd")
+    {
+        var userManager = services.GetRequiredService<UserManager<AppUser>>();
+        var now = DateTime.UtcNow;
 
-        await EnsureUserAsync(new ApplicationUser
+        foreach (var user in migrateUsers)
         {
-            DisplayName = "Test Manager",
-            Email = "manager@email.com",
-            UserName = "manager@email.com",
-            FirstName = "Test",
-            LastName = "Manager",
-            EmailConfirmed = true,
-            ProfileUrl = "/img/profiles/user3.svg",
-        }, "p@55wOrd", [Roles.Manager, Roles.Employee]);
+            var appUser = new AppUser
+            {
+                Id = user.Id,
+                UserName = user.Email,
+                Email = user.Email,
+                DisplayName = user.DisplayName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Handle = user.Handle,
+                ProfileUrl = user.ProfileUrl,
+                Avatar = user.Avatar,
+                RefIdStr = user.RefIdStr ?? Guid.NewGuid().ToString(),
+                LockoutEnabled = true,
+                LockoutEnd = user.LockedDate != null ? now.AddYears(10) : now,
+                LastLoginDate = user.LastLoginDate,
+                LastLoginIp = user.LastLoginIp,
+                CreatedDate = user.CreatedDate,
+                ModifiedDate = user.ModifiedDate,
+                EmailConfirmed = true,
+            };
+            await userManager.CreateAsync(appUser, tempPassword);
+            if (user.PasswordHash != null)
+            {
+                // Update raw PasswordHash (which uses older ASP.NET Identity v2 format), after users successfully signs in
+                // the password will be re-hashed using the latest ASP.NET Identity v3 implementation
+                dbContext.Users
+                    .Where(x => x.Id == user.Id)
+                    .ExecuteUpdate(setters => setters.SetProperty(x => x.PasswordHash, user.PasswordHash));
+            }
+        }
+    }
 
-        await EnsureUserAsync(new ApplicationUser
-        {
-            DisplayName = "Admin User",
-            Email = "admin@email.com",
-            UserName = "admin@email.com",
-            FirstName = "Admin",
-            LastName = "User",
-            EmailConfirmed = true,
-        }, "p@55wOrd", allRoles);
+    [Alias("AppUser")]
+    public class OldAppUser
+    {
+        [AutoIncrement]
+        public int Id { get; set; }
+        public string UserName { get; set; }
+        public string DisplayName { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string? Handle { get; set; }
+        public string Email { get; set; }
+        public string PasswordHash { get; set; }
+        public string? ProfileUrl { get; set; }
+        public string? Avatar { get; set; } //overrides ProfileUrl
+        public string? LastLoginIp { get; set; }
+        public DateTime? LastLoginDate { get; set; }
+        public string RefIdStr { get; set; }
+        public DateTime? LockedDate { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime ModifiedDate { get; set; }
     }
 }

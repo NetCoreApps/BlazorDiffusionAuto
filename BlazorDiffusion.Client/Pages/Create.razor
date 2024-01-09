@@ -1,6 +1,7 @@
 ﻿@page "/create"
 @attribute [Authorize]
 @inherits AppAuthComponentBase
+@rendermode InteractiveAuto
 
 <Home Page="AppPage.Create">
     <form class="mt-4 mx-auto shadow overflow-hidden sm:rounded-md w-[420px] sm:w-[600px]" @onsubmit="noop" @onsubmit:preventDefault>

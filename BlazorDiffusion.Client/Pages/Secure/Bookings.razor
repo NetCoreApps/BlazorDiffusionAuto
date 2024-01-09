@@ -1,6 +1,6 @@
 ﻿@page "/secure/bookings"
-@attribute [Authorize(Roles = Roles.Employee)]
-@rendermode InteractiveAuto
+@attribute [Authorize(Roles = "Employee")]
+@rendermode RenderMode.InteractiveServer
 @inject IJSRuntime JS
 
 <PageTitle>Bookings</PageTitle>

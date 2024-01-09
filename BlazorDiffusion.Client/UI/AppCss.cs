@@ -1,4 +1,4 @@
-﻿namespace BlazorDiffusion.UI;
+﻿namespace BlazorDiffusion.Client.UI;
 
 public static class AppCss
 {

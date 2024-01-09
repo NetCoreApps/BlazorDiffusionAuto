@@ -1,16 +1,13 @@
-﻿using Microsoft.JSInterop;
+﻿using BlazorDiffusion.Client;
+using BlazorDiffusion.Client.UI;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using ServiceStack;
-using ServiceStack.Text;
-using ServiceStack.Web;
 using ServiceStack.Blazor;
-using ServiceStack.Blazor.Components;
 using ServiceStack.Blazor.Components.Tailwind;
-using BlazorDiffusion.UI;
 using BlazorDiffusion.ServiceModel;
 
-namespace BlazorDiffusion.Pages;
+namespace BlazorDiffusion.Client.Pages;
 
 public partial class Create : AppAuthComponentBase, IDisposable
 {
