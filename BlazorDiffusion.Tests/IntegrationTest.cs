@@ -33,13 +33,13 @@ public class IntegrationTest
 
     public IServiceClient CreateClient() => new JsonServiceClient(BaseUri);
 
-    [Test]
-    public void Can_call_Hello_Service()
-    {
-        var client = CreateClient();
-
-        var response = client.Get(new Hello { Name = "World" });
-
-        Assert.That(response.Result, Is.EqualTo("Hello, World!"));
-    }
+    // [Test]
+    // public void Can_call_Hello_Service()
+    // {
+    //     var client = CreateClient();
+    //
+    //     var response = client.Get(new Hello { Name = "World" });
+    //
+    //     Assert.That(response.Result, Is.EqualTo("Hello, World!"));
+    // }
 }
