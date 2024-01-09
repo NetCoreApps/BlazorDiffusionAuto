@@ -13,6 +13,8 @@ using BlazorDiffusion.ServiceInterface;
 using BlazorDiffusion.ServiceModel;
 using Ljbc1994.Blazor.IntersectionObserver;
 
+AppHost.RegisterKey();
+
 var builder = WebApplication.CreateBuilder(args);
 
 var services = builder.Services;
