@@ -31,9 +31,7 @@ public class ConfigureDbMigrations : IHostingStartup
                 using (var scope = scopeFactory.CreateScope())
                 {
                     using var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    var dbJustCreated = dbContext.Database.EnsureCreated();
                     dbContext.Database.Migrate();
-
                     // Only seed users if DB was just created
                     if (!dbContext.Users.Any())
                     {
