@@ -22,6 +22,7 @@ public class IntegrationTest
 
     public IntegrationTest()
     {
+        BlazorDiffusion.AppHost.RegisterKey();
         appHost = new AppHost()
             .Init()
             .Start(BaseUri);
