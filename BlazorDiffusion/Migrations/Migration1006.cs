@@ -72,23 +72,9 @@ public class Migration1006 : MigrationBase
     }
 
     [Alias("AspNetUsers")]
-    public class AppUser : IdentityUser<int>
+    public class AppUser
     {
-        public string? FirstName { get; set; }
-        public string? LastName { get; set; }
-        public string? DisplayName { get; set; }
-        public string? ProfileUrl { get; set; }
-        [Input(Type = "file"), UploadTo("avatars")]
-        public string? Avatar { get; set; } //overrides ProfileUrl
-        public string? Handle { get; set; }
-        public int? RefId { get; set; }
-        public string RefIdStr { get; set; } = Guid.NewGuid().ToString();
-        public bool IsArchived { get; set; }
-        public DateTime? ArchivedDate { get; set; }
-        public string? LastLoginIp { get; set; }
-        public DateTime? LastLoginDate { get; set; }
-        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
-        public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
+        public int Id { get; set; }
     }
     
     public class Artifact
@@ -132,19 +118,12 @@ public class Migration1006 : MigrationBase
         public int Score { get; set; }
         public int Rank { get; set; }
         public string RefId { get; set; }
-        
         public DateTime CreatedDate { get; set; }
-        
         public string CreatedBy { get; set; }
-        
         public DateTime ModifiedDate { get; set; }
-        
         public string ModifiedBy { get; set; }
-        
         public DateTime? DeletedDate { get; set; }
-        
         public string DeletedBy { get; set; }
-        
         public string? FilePathSmall { get; set; } // 118x118 or 118x207
         public string? FilePathMedium { get; set; } // 288x288 or 288x504
         public string? FilePathLarge { get; set; } // Original Size in .webp
@@ -411,7 +390,17 @@ public class Migration1006 : MigrationBase
         var appHost = HostContext.AppHost;
         var log = appHost.GetApplicationServices().GetRequiredService<ILogger<ConfigureDbMigrations>>();
 
+        // Since renaming tables forces FKs to match, we need to recreate them in order
+        // of dependency from least to most dependent for any table that references AppUser.
+        // Drop and create FK for Creative
+        log.LogInformation("Migrating FKs from AppUser to AspNetUsers for Creative...");
+        ReplaceForeignKeyConstraint<Creative>();
+        
         ReplaceForeignKeyConstraint<Artifact>();
+        
+        // Drop and create FK for Album
+        log.LogInformation("Migrating FKs from AppUser to AspNetUsers for Album...");
+        ReplaceForeignKeyConstraint<Album>();
         
         log.LogInformation("Migrating FKs from AppUser to AspNetUsers for ArtifactLike...");
         ReplaceForeignKeyConstraint<ArtifactLike>();
@@ -419,10 +408,6 @@ public class Migration1006 : MigrationBase
         ReplaceForeignKeyConstraint<ArtifactComment>();
         
         ReplaceForeignKeyConstraint<ArtifactCommentReport>();
-        
-        // Drop and create FK for Album
-        log.LogInformation("Migrating FKs from AppUser to AspNetUsers for Album...");
-        ReplaceForeignKeyConstraint<Album>();
         
         // Drop and create FK for AlbumArtifact
         log.LogInformation("Migrating FKs for AlbumArtifact...");
@@ -435,10 +420,6 @@ public class Migration1006 : MigrationBase
         ReplaceForeignKeyConstraint<CreativeModifier>();
         
         ReplaceForeignKeyConstraint<CreativeArtist>();
-
-        // Drop and create FK for Creative
-        log.LogInformation("Migrating FKs from AppUser to AspNetUsers for Creative...");
-        ReplaceForeignKeyConstraint<Creative>();
         
         // Drop and create FK for ArtifactCommentVote
         log.LogInformation("Migrating FKs from AppUser to AspNetUsers for ArtifactCommentVote...");
@@ -449,22 +430,10 @@ public class Migration1006 : MigrationBase
         ReplaceForeignKeyConstraint<ArtifactReport>();
     }
 
-    private void DropOldTable<TModel>()
-    {
-        var modelDef = typeof(TModel).GetModelMetadata();
-        Db.ExecuteSql($@"PRAGMA foreign_keys = OFF;
-DROP TABLE IF EXISTS {modelDef.ModelName}_old;
-PRAGMA foreign_keys = ON;");
-    }
-
-    public override void Down()
-    {
-        base.Down();
-    }
-
     /// <summary>
-    /// I need to reproduce the following SQL process for any table pair.
-    /// It should follow the example SQL process below.
+    /// SQLite can't drop/recreate constraints, so we need to follow this SQL process.
+    /// Rename the table, create the new table, copy the data, drop the old table.
+    /// Eg, for Employee:
     /// ```
     /// PRAGMA foreign_keys=off;
     ///
@@ -486,6 +455,7 @@ PRAGMA foreign_keys = ON;");
     ///
     /// PRAGMA foreign_keys=on;
     /// ```
+    /// One limitation is it assumes order of columns is the same.
     /// </summary>
     /// <param name="fieldName"></param>
     /// <param name="refFieldName"></param>
