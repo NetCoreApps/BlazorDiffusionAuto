@@ -9,12 +9,17 @@ public class Migration1007 : MigrationBase
         DropOldTable<Migration1006.AlbumLike>();
         DropOldTable<Migration1006.AlbumArtifact>();
         DropOldTable<Migration1006.Album>();
+        
         DropOldTable<Migration1006.ArtifactLike>();
         DropOldTable<Migration1006.ArtifactCommentReport>();
-        DropOldTable<Migration1006.Creative>();
         DropOldTable<Migration1006.ArtifactCommentVote>();
+        DropOldTable<Migration1006.ArtifactComment>();
         DropOldTable<Migration1006.ArtifactReport>();
         DropOldTable<Migration1006.Artifact>();
+        
+        DropOldTable<Migration1006.CreativeArtist>();
+        DropOldTable<Migration1006.CreativeModifier>();
+        DropOldTable<Migration1006.Creative>();
     }
     
     private void DropOldTable<TModel>()
