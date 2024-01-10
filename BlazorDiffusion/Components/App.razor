@@ -15,13 +15,14 @@
         ["app.mjs"]              = ("/mjs/app.mjs", "/mjs/app.mjs"),
         ["@servicestack/client"] = ("/lib/mjs/servicestack-client.mjs", "/lib/mjs/servicestack-client.min.mjs"),
     })
-    <HeadOutlet />
+    <HeadOutlet @rendermode="InteractiveAuto" />
 </head>
 
 <body class="bg-white dark:bg-black dark:text-white">
     <Routes />
     <script src="_framework/blazor.web.js"></script>
     <script src="js/servicestack-blazor.js"></script>
+    <script>JS.init({ colorScheme:false })</script>
     <script>JS.init()</script>
     <script src="lib/js/highlight.js"></script>
     <script>hljs.highlightAll()</script>
