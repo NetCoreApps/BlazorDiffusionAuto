@@ -23,4 +23,8 @@
     <ItemGroup>
       <ProjectReference Include="..\BlazorDiffusion.ServiceModel\BlazorDiffusion.ServiceModel.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Components\Layout\MainLayout.razor" />
+    </ItemGroup>
 </Project>

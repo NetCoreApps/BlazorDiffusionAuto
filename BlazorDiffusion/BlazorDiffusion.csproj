@@ -83,4 +83,8 @@
         <Protobuf Include="proto\tensors.proto" GrpcServices="None" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Components\Layout\MainLayout.razor" />
+    </ItemGroup>
+
 </Project>
