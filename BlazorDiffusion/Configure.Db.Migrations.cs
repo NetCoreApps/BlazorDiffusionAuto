@@ -31,7 +31,7 @@ public class ConfigureDbMigrations : IHostingStartup
                 using (var scope = scopeFactory.CreateScope())
                 {
                     using var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    var dbJustCreated = dbContext.Database.EnsureCreated();
+                    dbContext.Database.EnsureCreated();
                     dbContext.Database.Migrate();
 
                     // Only seed users if DB was just created
@@ -98,7 +98,7 @@ public class ConfigureDbMigrations : IHostingStartup
             var roleExist = await roleManager.RoleExistsAsync(roleName);
             if (!roleExist)
             {
-                //create the roles and seed them to the database: Question 1
+                //create the roles and seed them to the database
                 assertResult(await roleManager.CreateAsync(new AppRole(roleName)));
             }
         }
