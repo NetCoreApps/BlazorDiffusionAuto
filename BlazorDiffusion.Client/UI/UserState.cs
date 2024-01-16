@@ -584,7 +584,7 @@ public class AppPrefs
 {
     public static int ClientWidth = 1536;
     public static string DefaultArtifactGalleryColumns => ClientWidth >= 768
-            ? "5"
+            ? "6"
             : "3";
 
     public string ArtifactGalleryColumns { get; set; } = DefaultArtifactGalleryColumns;
