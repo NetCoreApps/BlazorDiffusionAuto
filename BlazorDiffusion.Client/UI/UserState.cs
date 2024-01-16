@@ -583,7 +583,9 @@ public class UserState
 public class AppPrefs
 {
     public static int ClientWidth = 1536;
-    public static string DefaultArtifactGalleryColumns = "6";
+    public static string DefaultArtifactGalleryColumns => ClientWidth >= 768
+            ? "6"
+            : "3";
 
     public string ArtifactGalleryColumns { get; set; } = DefaultArtifactGalleryColumns;
     public bool Shuffle { get; set; } = true;
