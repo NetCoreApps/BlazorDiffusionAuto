@@ -67,6 +67,17 @@ builder.Services.AddScoped<KeyboardNavigation>();
 builder.Services.AddScoped<UserState>();
 builder.Services.AddIntersectionObserver();
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Register all services
+builder.Services.AddServiceStack(typeof(MyServices).Assembly, c => {
+    c.AddSwagger(o => {
+        //o.AddJwtBearer();
+        o.AddBasicAuth();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -82,6 +93,9 @@ else
     app.UseHsts();
 }
 
+app.UseSwagger();
+app.UseSwaggerUI();
+
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
@@ -95,7 +109,10 @@ app.MapRazorComponents<App>()
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
 
-app.UseServiceStack(new AppHost());
+app.UseServiceStack(new AppHost(), options =>
+{
+    options.MapEndpoints();
+});
 
 BlazorConfig.Set(new()
 {

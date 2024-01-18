@@ -340,7 +340,7 @@ public class DownloadArtifact : IGet, IReturn<byte[]>
 [Tag(Tag.Artifacts)]
 [ValidateIsAuthenticated]
 [Route("/download/direct/{RefId}")]
-public class DownloadDirect
+public class DownloadDirect: IGet, IReturn<Stream>
 {
     public string RefId { get; set; }
     public string? EncryptionMethod { get; set; }
@@ -361,7 +361,7 @@ public class FindSimilarArtifactsResponse
 }
 
 [Tag(Tag.Artifacts)]
-public class SearchData : IReturn<SearchDataResponse> {}
+public class SearchData : IGet,IReturn<SearchDataResponse> {}
 public class SearchDataResponse
 {
     public List<ArtistInfo> Artists { get; set; }

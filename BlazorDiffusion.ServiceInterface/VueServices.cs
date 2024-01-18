@@ -1,22 +1,11 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections;
-using System.Collections.Generic;
-using BlazorDiffusion.Data;
-using ServiceStack;
+﻿using ServiceStack;
 using ServiceStack.OrmLite;
-using ServiceStack.OrmLite.Legacy;
 using BlazorDiffusion.ServiceModel;
 
 namespace BlazorDiffusion.ServiceInterface;
 
-public class VueServices : Service
+public class VueServices(IAutoQueryDb AutoQuery,ICrudEvents CrudEvents) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; } = default!;
-    public ICrudEvents CrudEvents { get; set; }
-
     //public async Task<object> Any(QueryArtifactComments query)
     //{
     //    using var db = AutoQuery.GetDb(query, base.Request);

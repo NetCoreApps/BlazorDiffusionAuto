@@ -17,6 +17,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.*" />
         <PackageReference Include="BlazorIntersectionObserver" Version="3.1.0" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.*" />
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.*" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.*" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.*" />
@@ -38,6 +39,7 @@
         <PackageReference Include="ServiceStack.OrmLite.Sqlite.Data" Version="8.*" />
         <PackageReference Include="ServiceStack.Extensions" Version="8.*" />
         <PackageReference Include="ServiceStack.Server" Version="8.*" />
+        <PackageReference Include="ServiceStack.AspNetCore.OpenApi" Version="8.*" />
     </ItemGroup>
     
     <ItemGroup>

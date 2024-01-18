@@ -24,10 +24,8 @@ public class ConfigureDb : IHostingStartup
                 SqliteDialect.Provider);
             services.AddSingleton<IDbConnectionFactory>(dbFactory);
             ((DateTimeConverter)SqliteDialect.Provider.GetConverter<DateTime>()).DateStyle = DateTimeKind.Utc;
-        })
-        .ConfigureAppHost(appHost =>
-        {
-            using var db = appHost.Resolve<IDbConnectionFactory>().OpenDbConnection();
+            
+            using var db = dbFactory.OpenDbConnection();
             db.RegisterImgCompare();
         });
 }

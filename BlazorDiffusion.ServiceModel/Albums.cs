@@ -94,7 +94,7 @@ public class QueryAlbums : QueryDb<Album>
 }
 
 [Tag(Tag.Albums)]
-public class GetAlbumResults : IReturn<GetAlbumResultsResponse>
+public class GetAlbumResults : IGet,IReturn<GetAlbumResultsResponse>
 {
     public List<int>? Ids { get; set; }
     public List<string>? RefIds { get; set; }
@@ -200,14 +200,14 @@ public class GetCreativesInAlbumsResponse
 }
 
 [Tag(Tag.Albums)]
-public class GetAlbumIds : IReturn<GetAlbumIdsResponse> { }
+public class GetAlbumIds : IGet,IReturn<GetAlbumIdsResponse> { }
 public class GetAlbumIdsResponse
 {
     public List<int> Results { get; set; }
 }
 
 [Tag(Tag.Albums)]
-public class GetAlbumRefs : IReturn<GetAlbumRefsResponse> { }
+public class GetAlbumRefs : IGet,IReturn<GetAlbumRefsResponse> { }
 public class GetAlbumRefsResponse
 {
     public List<AlbumRef> Results { get; set; }

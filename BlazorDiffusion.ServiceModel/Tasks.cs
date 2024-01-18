@@ -41,7 +41,7 @@ public class AnalyticsTasks
 [Tag(Tag.Tasks)]
 [ExcludeMetadata]
 [ValidateIsAdmin]
-public class SyncTasks : IReturn<SyncTasksResponse>
+public class SyncTasks : IPost,IReturn<SyncTasksResponse>
 {
     public bool? Periodic { get; set; }
     public bool? Daily { get; set; }

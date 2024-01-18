@@ -6,7 +6,7 @@ namespace BlazorDiffusion.ServiceModel;
 
 [Tag(Tag.User)]
 [ValidateIsAuthenticated]
-public class GetUserProfile : IReturn<GetUserProfileResponse> {}
+public class GetUserProfile : IGet,IReturn<GetUserProfileResponse> {}
 public class GetUserProfileResponse
 {
     public UserProfile Result { get; set; }
@@ -61,7 +61,7 @@ public class GetAlbumUserDataResponse
 }
 
 [Tag(Tag.User)]
-public class AnonData : IReturn<AnonDataResponse> { }
+public class AnonData : IGet,IReturn<AnonDataResponse> { }
 public class AnonDataResponse
 {
     public List<AlbumResult> TopAlbums { get; set; }
@@ -70,7 +70,7 @@ public class AnonDataResponse
 
 [Tag(Tag.User)]
 [ValidateIsAuthenticated]
-public class CheckQuota : IReturn<CheckQuotaResponse>
+public class CheckQuota : IGet,IReturn<CheckQuotaResponse>
 {
     public int Images { get; set; }
     public int Width { get; set; }
@@ -88,7 +88,7 @@ public class CheckQuotaResponse
 
 [Tag(Tag.User)]
 [ValidateIsAuthenticated]
-public class UserData : IReturn<UserDataResponse> {}
+public class UserData : IGet,IReturn<UserDataResponse> {}
 public class UserDataResponse
 {
     public UserResult User { get; set; }
@@ -99,7 +99,7 @@ public class UserDataResponse
 }
 
 [Tag(Tag.User)]
-public class GetUserInfo : IReturn<GetUserInfoResponse>
+public class GetUserInfo : IGet,IReturn<GetUserInfoResponse>
 {
     public string RefId { get; set; }
 }

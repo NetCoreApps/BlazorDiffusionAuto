@@ -1,25 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ServiceStack;
-using ServiceStack.IO;
+﻿using ServiceStack;
 using ServiceStack.Logging;
 using ServiceStack.OrmLite;
-using ServiceStack.Host.NetCore;
 using BlazorDiffusion.ServiceModel;
-using System.IO;
-using ServiceStack.Host;
-using Microsoft.AspNetCore.Http;
 
 namespace BlazorDiffusion.ServiceInterface;
 
-public class SsgServies : Service
+public class SsgServices(IStableDiffusionClient StableDiffusionClient) : Service
 {
-    public static ILog Log = LogManager.GetLogger(typeof(SsgServies));
-    public HtmlTemplate HtmlTemplate { get; set; } = default!;
-    public IStableDiffusionClient StableDiffusionClient { get; set; } = default!;
-    public AppConfig AppConfig { get; set; } = default!;
+    public static ILog Log = LogManager.GetLogger(typeof(SsgServices));
 
     public async Task<object> Get(ViewCreativeMetadata request)
     {

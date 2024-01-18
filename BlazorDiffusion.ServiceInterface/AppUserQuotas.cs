@@ -1,13 +1,7 @@
 ﻿using BlazorDiffusion.ServiceModel;
-using Microsoft.Extensions.Logging;
 using ServiceStack;
 using ServiceStack.OrmLite;
-using ServiceStack.Web;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BlazorDiffusion.ServiceInterface;
 
@@ -19,7 +13,7 @@ public class AppUserQuotas
         AppRoles.Moderator,
     };
 
-    public Dictionary<string, int> DailyRoleQuotas { get; } = new()
+    public static Dictionary<string, int> DailyRoleQuotas { get; } = new()
     {
         [AppRoles.Creator] = 320,
     };
@@ -39,7 +33,7 @@ public class AppUserQuotas
     ///   100  = * 2
     ///   150  = * 3
     /// </summary>
-    public int CalculateCredits(ImageGeneration request) => request.Images *
+    public static int CalculateCredits(ImageGeneration request) => request.Images *
         (request.Width > 512
             ? 3
             : request.Height > 512
@@ -47,14 +41,14 @@ public class AppUserQuotas
                 : 1);
 
     // 12 credits = 4x Images x 3 credits (Portrait)
-    public string ToRequestDetails(ImageGeneration request) => $"{CalculateCredits(request)} credits = {request.Images}x Images x " +
+    public static string ToRequestDetails(ImageGeneration request) => $"{CalculateCredits(request)} credits = {request.Images}x Images x " +
         (request.Width > 512
             ? "3 credits (Landscape)"
             : request.Height > 512
                 ? "3 credits (Portrait)"
                 : "1 credit (Square)");
 
-    public async Task<QuotaError?> ValidateQuotaAsync(IDbConnection db, ImageGeneration request, int userId, ICollection<string> userRoles)
+    public static async Task<QuotaError?> ValidateQuotaAsync(IDbConnection db, ImageGeneration request, int userId, ICollection<string> userRoles)
     {
         var requestCredits = CalculateCredits(request);
         var quotaError = await ValidateQuotaAsync(db, requestCredits, userId, userRoles);
@@ -65,7 +59,7 @@ public class AppUserQuotas
         return quotaError;
     }
 
-    public int? GetDailyQuota(ICollection<string> userRoles)
+    public static int? GetDailyQuota(ICollection<string> userRoles)
     {
         if (userRoles.Any(x => UnrestrictedRoles.Contains(x)))
             return null;
@@ -79,7 +73,7 @@ public class AppUserQuotas
         return dailyQuota;
     }
 
-    public async Task<int> GetCreditsUsedAsync(IDbConnection db, int userId, DateTime since)
+    public static async Task<int> GetCreditsUsedAsync(IDbConnection db, int userId, DateTime since)
     {
         var creditsUsed = await db.ScalarAsync<int>(db.From<Artifact>()
             .Join<Creative>((x,y) => x.CreativeId == y.Id)
@@ -94,7 +88,7 @@ public class AppUserQuotas
         return creditsUsed;
     }
 
-    public async Task<QuotaError?> ValidateQuotaAsync(IDbConnection db, int requestedCredits, int userId, ICollection<string> userRoles)
+    public static async Task<QuotaError?> ValidateQuotaAsync(IDbConnection db, int requestedCredits, int userId, ICollection<string> userRoles)
     {
         var dailyQuota = GetDailyQuota(userRoles);
         if (dailyQuota == null)

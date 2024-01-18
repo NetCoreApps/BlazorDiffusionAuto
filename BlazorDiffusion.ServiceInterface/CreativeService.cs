@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Data;
 using BlazorDiffusion.ServiceModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,11 +8,10 @@ using ServiceStack.IO;
 using ServiceStack.Logging;
 using ServiceStack.OrmLite;
 using ServiceStack.Text;
-using SixLabors.ImageSharp;
 
 namespace BlazorDiffusion.ServiceInterface;
 
-public class CreativeService : Service
+public class CreativeService(AppConfig AppConfig, UserManager<AppUser> UserManager) : Service
 {
     public static ILog Log = LogManager.GetLogger(typeof(CreativeService));
 
@@ -36,10 +30,6 @@ public class CreativeService : Service
     public const int DefaultMaxWidth = 1344;
     public const int DefaultMaxHeight = 1344;
 
-    public AppConfig AppConfig { get; set; }
-    public AppUserQuotas UserQuotas { get; set; }
-    public UserManager<AppUser> UserManager { get; set; }
-
     public async Task<object> Any(CheckQuota request)
     {
         var session = await SessionAsAsync<CustomUserSession>();
@@ -52,10 +42,10 @@ public class CreativeService : Service
             Images = request.Images,
         };
         var imageGenerationRequest = CreateImageGenerationRequest(creative, new List<Modifier>(), new List<Artist>(), userRoles);
-        var requestCredits = UserQuotas.CalculateCredits(imageGenerationRequest);
+        var requestCredits = AppUserQuotas.CalculateCredits(imageGenerationRequest);
         var startOfDay = DateTime.UtcNow.Date;
-        var dailyQuota = UserQuotas.GetDailyQuota(userRoles) ?? -1;
-        var creditsUsed = await UserQuotas.GetCreditsUsedAsync(Db, userId, since: DateTime.UtcNow.Date);
+        var dailyQuota = AppUserQuotas.GetDailyQuota(userRoles) ?? -1;
+        var creditsUsed = await AppUserQuotas.GetCreditsUsedAsync(Db, userId, since: DateTime.UtcNow.Date);
 
         return new CheckQuotaResponse
         {
@@ -64,7 +54,7 @@ public class CreativeService : Service
             CreditsRequested = requestCredits,
             DailyQuota = dailyQuota,
             CreditsRemaining = dailyQuota == -1 ? -1 : dailyQuota - creditsUsed,
-            RequestedDetails = UserQuotas.ToRequestDetails(imageGenerationRequest),
+            RequestedDetails = AppUserQuotas.ToRequestDetails(imageGenerationRequest),
         };
     }
 
@@ -99,7 +89,7 @@ public class CreativeService : Service
 
         var imageGenerationRequest = CreateImageGenerationRequest(request, modifiers, artists, userRoles);
 
-        var quotaError = await UserQuotas.ValidateQuotaAsync(Db, imageGenerationRequest, userId, userRoles);
+        var quotaError = await AppUserQuotas.ValidateQuotaAsync(Db, imageGenerationRequest, userId, userRoles);
         if (quotaError != null)
         {
             Log.InfoFormat("User #{0} {1} exceeded quota, credits: {2} + {3} > {4}, time remaining: {5}",

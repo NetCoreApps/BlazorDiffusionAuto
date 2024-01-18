@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using ServiceStack;
 using ServiceStack.Logging;
 using ServiceStack.OrmLite;
@@ -11,12 +6,10 @@ using BlazorDiffusion.ServiceModel;
 
 namespace BlazorDiffusion.ServiceInterface;
 
-public class BackgroundMqServices : Service
+public class BackgroundMqServices(IStableDiffusionClient StableDiffusionClient,
+    AppConfig AppConfig) : Service
 {
     public static ILog Log = LogManager.GetLogger(typeof(BackgroundMqServices));
-    public HtmlTemplate HtmlTemplate { get; set; } = default!;
-    public IStableDiffusionClient StableDiffusionClient { get; set; } = default!;
-    public AppConfig AppConfig { get; set; } = default!;
 
     public async Task Any(DiskTasks request)
     {
@@ -219,7 +212,7 @@ public class BackgroundMqServices : Service
                 creatives.SelectMany(c => c.Artifacts.Select(x => x.Id)).Each(id => artifactIds.Add(id));
 
                 var artifacts = await Db.SelectByIdsAsync<Artifact>(artifactIds);
-                using var ssgServices = HostContext.ResolveService<SsgServies>(Request);
+                using var ssgServices = HostContext.ResolveService<SsgServices>(Request);
                 //await ssgServices.WriteArtifactHtmlPagesAsync(artifacts);
             }
 

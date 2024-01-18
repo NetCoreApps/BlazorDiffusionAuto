@@ -68,7 +68,7 @@ public class QueryCreatives : QueryDb<Creative>
 
 [Route("/creatives")]
 [DataContract]
-public class Creatives : IReturn<Creatives>
+public class Creatives : IGet,IReturn<Creatives>
 {
     [DataMember]
     public List<Creative> Items { get; set; }

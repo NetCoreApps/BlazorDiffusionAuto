@@ -1,15 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
-using Amazon.S3;
+﻿using Amazon.S3;
 using Amazon.S3.Model;
-using BlazorDiffusion.Data;
 using BlazorDiffusion.ServiceModel;
 using ServiceStack;
 using ServiceStack.OrmLite;
 
 namespace BlazorDiffusion.ServiceInterface;
 
-public class ArtifactServices : Service
+public class ArtifactServices(AppConfig AppConfig) : Service
 {
     public async Task<object> Post(CreateArtifactLike request)
     {
@@ -78,8 +75,6 @@ public class ArtifactServices : Service
 
         return new HttpResult(file, asAttachment:true);
     }
-
-    public AppConfig AppConfig { get; set; }
 
     public async Task<object> Any(DownloadDirect request)
     {

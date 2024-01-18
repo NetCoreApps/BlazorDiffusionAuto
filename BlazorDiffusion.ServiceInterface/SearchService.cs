@@ -5,10 +5,8 @@ using CoenM.ImageHash.HashAlgorithms;
 
 namespace BlazorDiffusion.ServiceInterface;
 
-public class SearchService : Service
+public class SearchService(IAutoQueryDb AutoQuery) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; }
-
     public async Task<object> Any(SearchArtifacts query)
     {
         var search = query.Query ?? "";

@@ -144,7 +144,7 @@ public class PrerenderResponse
 [Tag(Tag.Ssg)]
 [Route("/image/{Id}")]
 [Route("/artifacts/{Group}/{Slug}")]
-public class RenderArtifactHtml : IReturn<string>
+public class RenderArtifactHtml : IGet,IReturn<string>
 {
     public int? Group { get; set; }
     public int? Id { get; set; }
@@ -158,7 +158,7 @@ public class TestImageHtml : IReturnVoid {}
 [ExcludeMetadata]
 [Tag(Tag.Ssg)]
 [ValidateHasRole(AppRoles.Moderator)]
-public class PrerenderImages : IReturn<PrerenderResponse>
+public class PrerenderImages : IPost,IReturn<PrerenderResponse>
 {
     public bool Force { get; set; }
     public int[] Batches { get; set; }
@@ -167,7 +167,7 @@ public class PrerenderImages : IReturn<PrerenderResponse>
 [ExcludeMetadata]
 [Tag(Tag.Ssg)]
 [ValidateHasRole(AppRoles.Moderator)]
-public class PrerenderImage : IReturn<PrerenderResponse>
+public class PrerenderImage : IPost,IReturn<PrerenderResponse>
 {
     public int ArtifactId { get; set; }
 }
@@ -175,7 +175,7 @@ public class PrerenderImage : IReturn<PrerenderResponse>
 [ExcludeMetadata]
 [Tag(Tag.Ssg)]
 [ValidateHasRole(AppRoles.Moderator)]
-public class PrerenderSitemap : IReturn<PrerenderResponse>
+public class PrerenderSitemap : IPost,IReturn<PrerenderResponse>
 {
 }
 

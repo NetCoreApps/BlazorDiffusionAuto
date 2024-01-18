@@ -1,18 +1,12 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using ServiceStack;
+﻿using ServiceStack;
 using ServiceStack.OrmLite;
 using BlazorDiffusion.ServiceModel;
-using System;
 using System.Data;
 
 namespace BlazorDiffusion.ServiceInterface;
 
-public class DataService : Service
+public class DataService(IAutoQueryDb AutoQuery) : Service
 {
-    public IAutoQueryDb AutoQuery { get; set; }
-
     public async Task<object> Any(SearchData request)
     {
         var to = new SearchDataResponse

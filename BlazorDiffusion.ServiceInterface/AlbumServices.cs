@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using BlazorDiffusion.ServiceModel;
+﻿using BlazorDiffusion.ServiceModel;
 using ServiceStack;
 using ServiceStack.OrmLite;
 
 namespace BlazorDiffusion.ServiceInterface;
 
-public class AlbumServices : Service
-{
-    public IAutoQueryDb AutoQuery { get; set; }
-    public ICrudEvents CrudEvents { get; set; }
-    public AppData AppData { get; set; }
-
+public class AlbumServices(ICrudEvents CrudEvents) 
+    : Service
+{ 
     public async Task<object> Any(CreateAlbum request)
     {
         if (string.IsNullOrEmpty(request.Name))
