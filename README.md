@@ -1,8 +1,8 @@
 # Blazor Diffusion Auto
 
-[![](https://servicestack.net/images/whatsnew/v6.5/blazordiffusion.com_splash.png)](https://server.blazordiffusion.com)
+[![](https://servicestack.net/images/whatsnew/v6.5/blazordiffusion.com_splash.png)](https://auto.blazordiffusion.com)
 
-> Browse [source code](https://github.com/NetCoreTemplates/blazor-wasm) or view live demo [server.blazordiffusion.com](https://auto.blazordiffusion.com)
+> Browse [source code](https://github.com/NetCoreTemplates/blazor-wasm) or view live demo [auto.blazordiffusion.com](https://auto.blazordiffusion.com)
 
 [auto.blazordiffusion.com](https://auto.blazordiffusion.com) is a new [ServiceStack.Blazor App](https://servicestack.net/blazor) front-end for [Stable Diffusion](https://stability.ai/blog/stable-diffusion-public-release) - a deep learning text-to-image model that can generate quality images from a text prompt. 
 
@@ -21,7 +21,7 @@ The [/admin](https://github.com/NetCoreApps/BlazorDiffusionAuto/tree/master/Blaz
 To try out the Admin pages on the Live Demo Sign in with user `admin@email.com` and password `p@55wOrd`:
 
 <div class="flex justify-center">
-    <a href="https://server.blazordiffusion.com/admin">
+    <a href="https://auto.blazordiffusion.com/admin">
         <img src="https://github.com/ServiceStack/docs/raw/master/docs/images/blazor/blazordiffusion-admin-pages.png" style="width:600px">
     </a>
 </div>
@@ -31,6 +31,7 @@ To try out the Admin pages on the Live Demo Sign in with user `admin@email.com` 
 For a closer look, clone this repo to run a local modifiable copy, after unzipping go to [/BlazorDiffusion](https://github.com/NetCoreApps/BlazorDiffusionAuto/tree/master/BlazorDiffusion) and run:
 
 ```bash
+$ cd BlazorDiffusionAuto
 $ npm run migrate
 $ dotnet run
 ```
@@ -88,7 +89,7 @@ public class CreateModifier : ICreateDb<Modifier>, IReturn<Modifier>
 
 ### TagInput
 
-The [Artists.razor](https://github.com/NetCoreApps/BlazorDiffusion/blob/main/BlazorDiffusion/Pages/admin/Artists.razor) admin page uses [declarative TagInput](https://github.com/NetCoreApps/BlazorDiffusion/blob/v0.1/BlazorDiffusion.ServiceModel/Creative.cs#L122-L141) to render its AutoQueryGrid Create and Edit Forms:
+The [Artists.razor](https://github.com/NetCoreApps/BlazorDiffusionAuto/blob/master/BlazorDiffusion/Pages.Client/Admin/Artists.razor) admin page uses [declarative TagInput](https://github.com/NetCoreApps/BlazorDiffusion/blob/v0.1/BlazorDiffusion.ServiceModel/Creative.cs#L122-L141) to render its AutoQueryGrid Create and Edit Forms:
 
 ```csharp
 public class UpdateArtist : IPatchDb<Artist>, IReturn<Artist>
@@ -97,7 +98,7 @@ public class UpdateArtist : IPatchDb<Artist>, IReturn<Artist>
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public int? YearDied { get; set; }
-    [Input(Type = "tag"), FieldCss(Field = "col-span-12")]
+    [Input(Type="tag"), FieldCss(Field="col-span-12")]
     public List<string>? Type { get; set; }
 }
 ```
@@ -106,7 +107,7 @@ public class UpdateArtist : IPatchDb<Artist>, IReturn<Artist>
     <img src="https://github.com/ServiceStack/docs/raw/master/docs/images/blazor/blazordiffusion-TagInput.png" class="max-w-screen-md" style="border:1px solid #CACACA">
 </div>
 
-<h2 id="litestream" class="mx-auto max-w-screen-md text-center py-8 border-none">
+<h2 id="litestream" class="mx-auto max-w-screen-md text-center py-8 border-none border-b: 1px solid">
     <a href="https://litestream.io">
         <img src="https://github.com/ServiceStack/docs/raw/master/docs/images/litestream/logo.svg">
     </a>
