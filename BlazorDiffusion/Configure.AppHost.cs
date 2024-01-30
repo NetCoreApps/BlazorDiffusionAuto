@@ -106,11 +106,8 @@ public class AppHost : AppHostBase, IHostingStartup
         SetConfig(new HostConfig {
             IgnorePathInfoPrefixes = { "/appsettings", "/_framework" },
         });
-        
-        ScriptContext.Args[nameof(AppData)] = new AppData
-        {
 
-        };
+        ScriptContext.Args[nameof(AppData)] = AppData.Instance;
     }
     
     public static void RegisterKey() =>
