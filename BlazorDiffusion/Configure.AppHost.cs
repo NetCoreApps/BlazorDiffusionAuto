@@ -107,6 +107,10 @@ public class AppHost : AppHostBase, IHostingStartup
             IgnorePathInfoPrefixes = { "/appsettings", "/_framework" },
         });
         
+        ScriptContext.Args[nameof(AppData)] = new AppData
+        {
+
+        };
     }
     
     public static void RegisterKey() =>
