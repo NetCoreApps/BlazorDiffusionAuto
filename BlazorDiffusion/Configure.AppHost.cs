@@ -97,8 +97,6 @@ public class AppHost : AppHostBase, IHostingStartup
                 PublicPrefix = appConfig.AssetsBasePath,
                 VirtualFiles = appFs
             });
-            
-            services.AddPlugin(new IdentityAdminUsersFeature<AppUser,int>());
         });
     
     public AppHost() : base("BlazorDiffusion", typeof(MyServices).Assembly) { }
