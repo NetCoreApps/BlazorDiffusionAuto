@@ -2,6 +2,7 @@ using Amazon.S3;
 using Funq;
 using BlazorDiffusion.ServiceInterface;
 using BlazorDiffusion.ServiceModel;
+using ServiceStack.Auth;
 using ServiceStack.Configuration;
 using ServiceStack.IO;
 
@@ -96,6 +97,8 @@ public class AppHost : AppHostBase, IHostingStartup
                 PublicPrefix = appConfig.AssetsBasePath,
                 VirtualFiles = appFs
             });
+            
+            services.AddPlugin(new IdentityAdminUsersFeature<AppUser,int>());
         });
     
     public AppHost() : base("BlazorDiffusion", typeof(MyServices).Assembly) { }

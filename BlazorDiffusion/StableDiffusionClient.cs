@@ -12,7 +12,7 @@ public class DreamStudioClient : IStableDiffusionClient
 {
     GrpcChannel channel;
     GenerationService.GenerationServiceClient client;
-    public const string DefaultEngineId = "stable-diffusion-v1-5";
+    public const string DefaultEngineId = "stable-diffusion-xl-1024-v1-0";
 
     public string ApiKey { get; set; }
     public string OutputPathPrefix { get; set; }

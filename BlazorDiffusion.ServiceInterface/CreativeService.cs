@@ -11,11 +11,9 @@ using ServiceStack.Text;
 
 namespace BlazorDiffusion.ServiceInterface;
 
-public class CreativeService(AppConfig AppConfig, UserManager<AppUser> UserManager) : Service
+public class CreativeService(AppConfig AppConfig, UserManager<AppUser> UserManager,IStableDiffusionClient StableDiffusionClient) : Service
 {
     public static ILog Log = LogManager.GetLogger(typeof(CreativeService));
-
-    public IStableDiffusionClient StableDiffusionClient { get; set; } = default!;
 
     public const string DefaultEngineId = "stable-diffusion-xl-1024-v1-0"; // "stable-diffusion-v1-5";
 
