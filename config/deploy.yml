@@ -6,7 +6,6 @@ image: netcoreapps/blazordiffusionauto
 
 env:
   clear:
-    VIRTUAL_HOST: auto.blazordiffusion.com
     DEPLOY_API: auto.blazordiffusion.com
 
 # Deploy to these servers.
