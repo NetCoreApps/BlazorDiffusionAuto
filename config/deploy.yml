@@ -38,6 +38,7 @@ builder:
 
 volumes:
   - "/opt/docker/blazor-diffusion-auto/App_Data:/app/App_Data"
+  - "/opt/docker/blazor-diffusion-auto/App_Files:/app/App_Files"
 
 #accessories:
 #  litestream:
