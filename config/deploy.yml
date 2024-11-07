@@ -4,6 +4,11 @@ service: blazor-diffusion-auto
 # Name of the container image.
 image: netcoreapps/blazordiffusionauto
 
+env:
+  clear:
+    VIRTUAL_HOST: auto.blazordiffusion.com
+    DEPLOY_API: auto.blazordiffusion.com
+
 # Deploy to these servers.
 servers:
   # IP address of server, optionally use env variable.
