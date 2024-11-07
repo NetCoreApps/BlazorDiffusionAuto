@@ -37,8 +37,8 @@ builder:
   arch: amd64
 
 volumes:
-  - "/opt/docker/blazor-diffusion-auto/App_Data:/app/App_Data"
-  - "/opt/docker/blazor-diffusion-auto/App_Files:/app/App_Files"
+  - "/opt/docker/BlazorDiffusionAuto/App_Data:/app/App_Data"
+  - "/opt/docker/BlazorDiffusionAuto/App_Files:/app/App_Files"
 
 #accessories:
 #  litestream:
