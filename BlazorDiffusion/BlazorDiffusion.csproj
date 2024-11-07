@@ -14,6 +14,11 @@
         <Using Include="ServiceStack" />
     </ItemGroup>
 
+
+    <ItemGroup>
+        <ContainerLabel Include="service" Value="blazor-diffusion-auto" />
+    </ItemGroup>
+
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.*" />
         <PackageReference Include="BlazorIntersectionObserver" Version="3.1.0" />
